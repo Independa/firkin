@@ -1,0 +1,9 @@
+README
+firkin.py
+setup.py
+firkin.egg-info/PKG-INFO
+firkin.egg-info/SOURCES.txt
+firkin.egg-info/dependency_links.txt
+firkin.egg-info/top_level.txt
+test/test.py
+test/test_groups.py

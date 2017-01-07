@@ -1,0 +1,112 @@
+What is firkin?
+
+   firkin is a python module to convert between different measurement
+   units.
+
+Status
+
+   firkin is alpha software. So far it seems to work for me but it may
+   have severe bugs I didn't noticed yet. Use it at your own risk.
+
+   Firkin is still under development and the API may change in the future.
+
+Requirements
+
+   firkin only needs the Python standard lib
+
+Usage
+
+   First we create an instance of UnitManager:
+>>> um=UnitManager()
+
+   Next we create two families of units. The first one ist liter and uses
+   SIFamily to automatically create units with the SI prefixes:
+   prefix meaning value
+   f      femto   10^-15
+   p      pico    10^-12
+   n      nano    10^-9
+   µ      micro   10^-6
+   m      milli   10^-3
+   k      kilo    10^3
+   M      mega    10^6
+   G      giga    10^9
+   T      tera    10^12
+>>> um.add(SIFamily(base='l', name='liter'))
+
+   Now our UnitManager knows about fl, pl, nl, ..., Ml, Gl, Tl.
+
+   How many liters are 10000 ml?:
+>>> um.convert_to_unit(1e4, 'ml', 'l')
+(Decimal("10.0000"), 'l')
+
+   Next we create a family by hand:
+>>> f=Family(name='f', base='gallon')
+>>> f.add('barrel', 36, 'gallon')
+>>> f.add('kilderkin', 0.5, 'barrel')
+>>> f.add('firkin', 0.5, 'kilderkin')
+
+   Now we have a family called f that used gallon as its base and knows
+   about barrel, kilderkin and firkin, too.
+
+   How much gallons is one firkin?:
+>>> f.convert(1, 'firkin', 'gallon')
+(Decimal("9.00"), 'gallon')
+
+   What's the best way to express 3 kilderkin?:
+>>> f.autoconvert(3, 'kilderkin')
+(Decimal("1.50"), 'barrel')
+
+   To convert between family f and family liter we need to add f to our
+   UnitManager and tell how much liters (base unit of family liter) a
+   gallon (base unit of family f) is:
+>>> um.add(f, other='liter',  factor=4.54609)
+
+   Of course the UnitManger can convert firkin to gallon, too:
+>>> um.convert_to_unit(1, 'firkin', 'gallon')
+(Decimal("9.00"), 'gallon')
+
+   But it also can convert firkin to liters:
+>>> um.convert_to_unit(1, 'firkin', 'l')
+(Decimal("40.9148100"), 'l')
+
+   Or find the best way to express one liter in one of the units from
+   family f:
+>>> um.convert_to_family(1, 'l', 'f')
+(Decimal("0.219969248299"), 'gallon')
+
+   That works with barrels, too:
+>>> um.convert_to_family(1, 'barrel', 'f')
+(Decimal("1.00"), 'barrel')
+
+   A classical example: How to convert between °C and °F?
+
+   We need a family for °C:
+>>> um.add(Family(base='°C'))
+
+   and for °F.
+
+   °F is (°C-32)/1.8:
+>>> um.add(Family(base='°F'), other='°C', offset=(-32/1.8), factor=5.0/9)
+
+   Now we can convert:
+>>> um.convert_to_unit(32, '°F', '°C')
+(Decimal("-8E-12"), '°C')
+>>> um.convert_to_unit(100, '°C', '°F')
+(Decimal("212.0"), '°F')
+
+   Converting between °C and ml isn't useful:
+>>> um.convert_to_unit(1, '°C', 'ml')
+(None, None)
+
+License
+
+   This program is free software; you can redistribute it and/or modify it
+   under the terms of the GNU General Public License as published by the
+   Free Software Foundation; either version 2 of the License, or (at your
+   option) any later version.
+
+   This program is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the [12]GNU
+   General Public License for more details.
+
